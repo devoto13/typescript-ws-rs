@@ -1,0 +1,13 @@
+{
+  "name": "ws-rs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "express": "4.15.2",
+    "typescript": "2.2.1"
+  }
+}

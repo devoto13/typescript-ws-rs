@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "none",
+    "target": "es6",
+    "outDir": "lib",
+    "noImplicitAny": false,
+    "sourceMap": false,
+    "experimentalDecorators": true
+  },
+  "files": [
+    "src/index.ts"
+  ]
+}
