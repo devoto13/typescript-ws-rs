@@ -111,8 +111,9 @@ function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
 // Usage
 
 interface User {
-    id: number;
+    id: string;
     name: string;
+    active: 'yes' | 'no';
 }
 
 class UsersResource {
