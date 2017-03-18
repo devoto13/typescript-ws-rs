@@ -64,8 +64,6 @@ function QueryParam(name: string) {
 function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
     const metadata = getResourceMetadata(resourceSpec.prototype);
 
-    console.log(metadata);
-
     const constructor = (new Function(`return function ${resourceSpec.name}(){ }`))() as Type<T>;
 
     Object.getOwnPropertyNames(resourceSpec.prototype).forEach((propertyName) => {
@@ -84,8 +82,6 @@ function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
                 methodMetadata.queryParams.forEach((value) => {
                     (url as any).searchParams.append(value.name, args[ value.valueFromIndex ]);
                 });
-
-                console.log(url.toString());
 
                 return fetch(url.toString(), {
                     method: methodMetadata.method || 'GET',
