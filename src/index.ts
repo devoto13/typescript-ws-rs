@@ -13,37 +13,58 @@ class ResourceMetadata {
 interface MethodMetadata {
     path?: string;
     method?: string;
+    pathParams?: Array<{ name: string, valueFromIndex: number }>;
+    queryParams?: Array<{ name: string, valueFromIndex: number }>;
 }
 
-function getMetadata(resourceConstructor: any): ResourceMetadata {
-    if (resourceConstructor.metadata == null) {
+function getResourceMetadata(resourceConstructor: any): ResourceMetadata {
+    if (!resourceConstructor.hasOwnProperty('metadata')) {
         resourceConstructor.metadata = new ResourceMetadata();
     }
     return resourceConstructor.metadata;
 }
 
-function GET() {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        const metadata = getMetadata(target.constructor);
-        if (!metadata.methods.has(propertyKey)) {
-            metadata.methods.set(propertyKey, {});
-        }
-        metadata.methods.get(propertyKey).method = 'GET';
-    };
+function getMethodMetadata(resourceConstructor: any, propertyKey: string): MethodMetadata {
+    const metadata = getResourceMetadata(resourceConstructor);
+    if (!metadata.methods.has(propertyKey)) {
+        metadata.methods.set(propertyKey, {});
+    }
+
+    return metadata.methods.get(propertyKey);
+}
+
+function GET(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const metadata = getMethodMetadata(target, propertyKey);
+    metadata.method = 'GET';
 }
 
 function Path(value: string) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        const metadata = getMetadata(target.constructor);
-        if (!metadata.methods.has(propertyKey)) {
-            metadata.methods.set(propertyKey, {});
-        }
-        metadata.methods.get(propertyKey).path = value;
+        const metadata = getMethodMetadata(target, propertyKey);
+        metadata.path = value;
+    };
+}
+
+function PathParam(name: string) {
+    return function (target: any, propertyKey: string, parameterIndex: number) {
+        const metadata = getMethodMetadata(target, propertyKey);
+        metadata.pathParams = metadata.pathParams || [];
+        metadata.pathParams.push({ name, valueFromIndex: parameterIndex });
+    };
+}
+
+function QueryParam(name: string) {
+    return function (target: any, propertyKey: string, parameterIndex: number) {
+        const metadata = getMethodMetadata(target, propertyKey);
+        metadata.queryParams = metadata.queryParams || [];
+        metadata.queryParams.push({ name, valueFromIndex: parameterIndex });
     };
 }
 
 function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
-    const metadata = getMetadata(resourceSpec);
+    const metadata = getResourceMetadata(resourceSpec.prototype);
+
+    console.log(metadata);
 
     const constructor = (new Function(`return function ${resourceSpec.name}(){ }`))() as Type<T>;
 
@@ -52,7 +73,21 @@ function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
             const methodMetadata = metadata.methods.get(propertyName);
 
             const value = function () {
-                return fetch(new URL(methodMetadata.path, baseUrl).toString(), {
+                const args = Array.from(arguments);
+
+                const path = methodMetadata.pathParams.reduce((path, value) => {
+                    return path.replace(`{${value.name}}`, args[ value.valueFromIndex ]);
+                }, methodMetadata.path);
+
+                const url = new URL(path, baseUrl);
+
+                methodMetadata.queryParams.forEach((value) => {
+                    (url as any).searchParams.append(value.name, args[ value.valueFromIndex ]);
+                });
+
+                console.log(url.toString());
+
+                return fetch(url.toString(), {
                     method: methodMetadata.method || 'GET',
                 })
                     .then((response) => response.json());
@@ -81,16 +116,16 @@ interface User {
 }
 
 class UsersResource {
-    @GET()
-    @Path('/test')
-    getUser(): Promise<User> {
+    @GET
+    @Path('/users/{id}')
+    getUser(@PathParam('id') id: string, @QueryParam('active') active: string): Promise<User> {
         return null;
     }
 }
 
 const client = buildClient(UsersResource, 'http://localhost:8000');
 
-client.getUser()
+client.getUser('4', 'yes')
     .then((user) => {
         console.log(user);
     })

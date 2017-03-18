@@ -11,8 +11,9 @@ const allowCrossDomain = function (req, res, next) {
 
 app.use(allowCrossDomain);
 
-app.get('/test', function (req, res) {
-  res.send(JSON.stringify({ id: 4, name: 'John Doe' }));
+app.get('/users/:id', function (req, res) {
+  console.log(req.queryParams);
+  res.send(JSON.stringify({ id: req.params.id, name: 'John Doe', active: req.query.active }));
 });
 
 app.listen(8000, function () {
