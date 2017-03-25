@@ -1,4 +1,4 @@
-import { getMethodMetadata } from './core';
+import { getMethodMetadata, getResourceMetadata } from './core';
 
 export function GET(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const metadata = getMethodMetadata(target, propertyKey);
@@ -26,9 +26,14 @@ export function DELETE(target: any, propertyKey: string, descriptor: PropertyDes
 }
 
 export function Path(value: string) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        const metadata = getMethodMetadata(target, propertyKey);
-        metadata.path = value;
+    return function (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) {
+        if (propertyKey != null) {
+            const metadata = getMethodMetadata(target, propertyKey);
+            metadata.path = value;
+        } else {
+            const metadata = getResourceMetadata(target);
+            metadata.basePath = value;
+        }
     };
 }
 

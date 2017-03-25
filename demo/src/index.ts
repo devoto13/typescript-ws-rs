@@ -6,9 +6,10 @@ interface User {
     active: 'yes' | 'no';
 }
 
+@Path('/users')
 class UsersResource {
     @GET
-    @Path('/users/{id}')
+    @Path('/{id}')
     getUser(@PathParam('id') id: string, @QueryParam('active') active: string): Promise<User> {
         return null;
     }

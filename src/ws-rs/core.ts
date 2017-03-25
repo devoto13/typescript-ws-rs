@@ -1,6 +1,7 @@
 import { Type } from './utils';
 
 export class ResourceMetadata {
+    basePath: string;
     methods: Map<string, MethodMetadata> = new Map<string, MethodMetadata>();
 }
 
@@ -18,8 +19,8 @@ export function getResourceMetadata(resourceConstructor: any): ResourceMetadata 
     return resourceConstructor.metadata;
 }
 
-export function getMethodMetadata(resourceConstructor: any, propertyKey: string): MethodMetadata {
-    const metadata = getResourceMetadata(resourceConstructor);
+export function getMethodMetadata(resourcePrototype: any, propertyKey: string): MethodMetadata {
+    const metadata = getResourceMetadata(resourcePrototype.constructor);
     if (!metadata.methods.has(propertyKey)) {
         metadata.methods.set(propertyKey, {});
     }
@@ -27,21 +28,25 @@ export function getMethodMetadata(resourceConstructor: any, propertyKey: string)
     return metadata.methods.get(propertyKey);
 }
 
-export function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
-    const metadata = getResourceMetadata(resourceSpec.prototype);
+export function buildClient<T>(resourceConstructor: Type<T>, baseUrl: string): T {
+    const metadata = getResourceMetadata(resourceConstructor);
 
-    const constructor = (new Function(`return function ${resourceSpec.name}(){ }`))() as Type<T>;
+    const constructor = (new Function(`return function ${resourceConstructor.name}(){ }`))() as Type<T>;
 
-    Object.getOwnPropertyNames(resourceSpec.prototype).forEach((propertyName) => {
+    Object.getOwnPropertyNames(resourceConstructor.prototype).forEach((propertyName) => {
         if (metadata.methods.has(propertyName)) {
             const methodMetadata = metadata.methods.get(propertyName);
 
             const value = function () {
                 const args = Array.from(arguments);
 
+                const pathTemplate = metadata.basePath != null
+                    ? metadata.basePath + methodMetadata.path
+                    : methodMetadata.path;
+
                 const path = methodMetadata.pathParams.reduce((path, value) => {
                     return path.replace(`{${value.name}}`, args[ value.valueFromIndex ]);
-                }, methodMetadata.path);
+                }, pathTemplate);
 
                 const url = new URL(path, baseUrl);
 
@@ -62,7 +67,7 @@ export function buildClient<T>(resourceSpec: Type<T>, baseUrl: string): T {
                 value: value,
             });
         } else {
-            const descriptor = Object.getOwnPropertyDescriptor(resourceSpec.prototype, propertyName);
+            const descriptor = Object.getOwnPropertyDescriptor(resourceConstructor.prototype, propertyName);
             Object.defineProperty(constructor.prototype, propertyName, descriptor);
         }
     });
