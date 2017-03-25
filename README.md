@@ -45,7 +45,7 @@ Is it possible to build HTTP clients using annotations similar to JAVA WS RS in 
     
 ### Build library
 
-	$ yarn build:lib
+	$ yarn build
 	
 ### Build and run demo
 
