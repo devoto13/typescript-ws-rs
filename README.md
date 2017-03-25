@@ -6,7 +6,7 @@ Is it possible to build HTTP clients using annotations similar to JAVA WS RS in 
 
 ## Use
 
-	$ yarn install ws-rs
+	$ npm install ws-rs
 	
 ## Example
 
