@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": "",
+    "paths": {
+      "ws-rs": ["../../src/ws-rs/index.d.ts"]
+    },
+    "target": "es2015",
+    "noImplicitAny": true,
+    "experimentalDecorators": true
+  }
+}

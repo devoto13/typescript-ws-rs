@@ -1,13 +1,21 @@
 {
-  "name": "ws-rs",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "typescript-ws-rs",
+  "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc -p src/tsconfig.json && rollup -c",
+    "prebuild:demo": "yarn build && cp dist/ws-rs.umd.js demo/dist/ws-rs.umd.js",
+    "build:demo": "tsc -p demo/src/tsconfig.json && rollup -c rollup.config.demo.js",
+    "serve:demo": "concurrently 'node demo/api.js' 'http-server demo'"
   },
   "devDependencies": {
+    "concurrently": "3.4.0",
     "express": "4.15.2",
+    "http-server": "0.9.0",
+    "rollup": "0.41.6",
     "typescript": "2.2.1"
-  }
+  },
+  "main": "dist/ws-rs.umd.js",
+  "module": "src/ws-rs/index.js",
+  "types": "src/ws-rs/index.d.ts"
 }

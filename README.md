@@ -8,18 +8,11 @@ Is it possible to build HTTP clients using annotations similar to JAVA WS RS in 
 
     $ yarn install
     
-## Build 
+## Build library
 
-	$ yarn build
+	$ yarn build:lib
 	
-## Run
+## Build and run demo
 
-Start API mock:
-
-	$ node api.js
-
-Start API mock:
-
-	$ open index.html
-
-See console.
+	$ yarn build:demo
+	$ yarn serve:demo
