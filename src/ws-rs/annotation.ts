@@ -5,6 +5,26 @@ export function GET(target: any, propertyKey: string, descriptor: PropertyDescri
     metadata.method = 'GET';
 }
 
+export function POST(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const metadata = getMethodMetadata(target, propertyKey);
+    metadata.method = 'POST';
+}
+
+export function PUT(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const metadata = getMethodMetadata(target, propertyKey);
+    metadata.method = 'PUT';
+}
+
+export function PATCH(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const metadata = getMethodMetadata(target, propertyKey);
+    metadata.method = 'PATCH';
+}
+
+export function DELETE(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const metadata = getMethodMetadata(target, propertyKey);
+    metadata.method = 'DELETE';
+}
+
 export function Path(value: string) {
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         const metadata = getMethodMetadata(target, propertyKey);
