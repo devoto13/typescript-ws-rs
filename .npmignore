@@ -1,0 +1,9 @@
+/demo/
+/package/
+/ws-rs-*.tgz
+/rollup.config.demo.js
+/rollup.config.js
+/yarn.lock
+/src/**/*.ts
+!/src/**/*.d.ts
+/src/tsconfig.json

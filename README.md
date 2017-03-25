@@ -3,16 +3,50 @@
 **It's an experiment to test the idea.**
  
 Is it possible to build HTTP clients using annotations similar to JAVA WS RS in TypeScript.
+
+## Use
+
+	$ yarn install ws-rs
+	
+## Example
+
+	import { buildClient, GET, Path, PathParam, QueryParam } from 'ws-rs';
+	
+	interface User {
+		id: string;
+		name: string;
+		active: 'yes' | 'no';
+	}
+	
+	class UsersResource {
+		@GET
+		@Path('/users/{id}')
+		getUser(@PathParam('id') id: string, @QueryParam('active') active: string): Promise<User> {
+			return null;
+		}
+	}
+	
+	const client = buildClient(UsersResource, 'http://localhost:8000');
+	
+	client.getUser('4', 'yes')
+		.then((user) => {
+			console.log(user);
+		})
+		.catch((error) => {
+			console.error(error);
+		});
+	
+## Develop
  
-## Install
+### Install dev-dependencies
 
     $ yarn install
     
-## Build library
+### Build library
 
 	$ yarn build:lib
 	
-## Build and run demo
+### Build and run demo
 
 	$ yarn build:demo
 	$ yarn serve:demo
